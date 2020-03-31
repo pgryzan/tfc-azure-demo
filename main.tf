@@ -32,7 +32,7 @@ locals {
         project                     = "demo"
         expires                     = "${timeadd(timestamp(), format("%vh", local.ttl))}"
     }
-    tcp_ports                       = ["22", "443", "1433", "5985-5986"]
+    tcp_ports                       = ["22", "80", "443", "1433", "5985-5986"]
     tcp_udp_ports                   = ["3389", "9631", "9638"]
 }
 
