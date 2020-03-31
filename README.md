@@ -1,2 +1,2 @@
 # tfc-azure-demo
-Terraform Cloud Demo
+Terraform Cloud Demo on Azure
