@@ -7,8 +7,6 @@
 //  
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-output "windows" {
-    value           = {
-        addresses   = azurerm_public_ip.azure_pip[*].ip_address
-    }
+output "windows_addresses" {
+    value   = azurerm_public_ip.azure_pip[*].ip_address
 }
