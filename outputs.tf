@@ -9,6 +9,6 @@
 
 output "windows" {
     value           = {
-        ip          = "${azurerm_public_ip.azure_pip.ip_address}"
+        addresses   = azurerm_public_ip.azure_pip[*].ip_address
     }
 }
