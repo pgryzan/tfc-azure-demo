@@ -37,4 +37,9 @@ variable "image" {
         version     = "latest"
     }
     description     = "The vm image"
-}           
+}
+
+variable "vm_count" {
+    default         = 2
+    description     = "The number of VMs we want"
+}

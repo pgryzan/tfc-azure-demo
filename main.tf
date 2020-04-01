@@ -82,7 +82,7 @@ resource "azurerm_subnet" "azure_subnet" {
 //  Create a Security Group
 resource "azurerm_network_security_group" "azure_sg" {
     name                            = "${local.name}-sg"
-    location                        = var.azure["region"]
+    location                        = azurerm_resource_group.azure_rg.location
     resource_group_name             = azurerm_resource_group.azure_rg.name
     tags                            = merge(local.tags, map("role", "security group"))
 }
@@ -136,8 +136,9 @@ resource "azurerm_network_security_rule" "azure_tcp_udp_ingress" {
 
 //  Create a Public IP
 resource "azurerm_public_ip" "azure_pip" {
-    name                            = "${local.name}-pip"
-    location                        = var.azure["region"]
+    count                           = var.vm_count
+    name                            = "${local.name}-pip-${count.index}"
+    location                        = azurerm_resource_group.azure_rg.location
     resource_group_name             = azurerm_resource_group.azure_rg.name
     allocation_method               = "Static"
     tags                            = merge(local.tags, map("role", "public ip"))
@@ -145,25 +146,27 @@ resource "azurerm_public_ip" "azure_pip" {
 
 //  Create a Network Interface
 resource "azurerm_network_interface" "azure_nic" {
-    name                            = "${local.name}-nic"
+    count                           = var.vm_count
+    name                            = "${local.name}-nic-${count.index}"
     location                        = azurerm_resource_group.azure_rg.location
     resource_group_name             = azurerm_resource_group.azure_rg.name
     tags                            = merge(local.tags, map("role", "network interface"))
 
     ip_configuration {
-        name                            = "${local.name}-ipconfig"
+        name                            = "${local.name}-ipconfig-${count.index}"
         subnet_id                       = azurerm_subnet.azure_subnet.id
         private_ip_address_allocation   = "dynamic"
-        public_ip_address_id            = azurerm_public_ip.azure_pip.id
+        public_ip_address_id            = azurerm_public_ip.azure_pip[count.index].id
     }
 }
 
 //  Create the Windows VM and Upload the Bootstrap Data
 resource "azurerm_virtual_machine" "azure_windows_instance" {
-    name                            = "${local.name}-vm"
+    count                           = var.vm_count
+    name                            = "${local.name}-vm-${count.index}"
     location                        = azurerm_resource_group.azure_rg.location
     resource_group_name             = azurerm_resource_group.azure_rg.name
-    network_interface_ids           = ["${azurerm_network_interface.azure_nic.id}"]
+    network_interface_ids           = ["${azurerm_network_interface.azure_nic[count.index].id}"]
     vm_size                         = var.instance_type
     tags                            = merge(local.tags, map("role", "vm"))
     delete_os_disk_on_termination   = true
@@ -176,7 +179,7 @@ resource "azurerm_virtual_machine" "azure_windows_instance" {
     }
 
     storage_os_disk {
-        name                        = "${local.name}-disk"
+        name                        = "${local.name}-disk-${count.index}"
         caching                     = "ReadWrite"
         create_option               = "FromImage"
         managed_disk_type           = "StandardSSD_LRS"
@@ -203,8 +206,9 @@ resource "azurerm_virtual_machine" "azure_windows_instance" {
 
 //  Execute the Bootstap with a Azure VM Extension
 resource "azurerm_virtual_machine_extension" "azure_extension" {
-    name                            = "${local.name}-extension"
-    virtual_machine_id             = azurerm_virtual_machine.azure_windows_instance.id
+    count                           = var.vm_count
+    name                            = "${local.name}-extension-${count.index}"
+    virtual_machine_id             = azurerm_virtual_machine.azure_windows_instance[count.index].id
     tags                            = merge(local.tags, map("role", "vm extension"))
     publisher                       = "Microsoft.Compute"
     type                            = "CustomScriptExtension"
