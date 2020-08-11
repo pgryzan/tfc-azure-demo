@@ -76,7 +76,7 @@ resource "azurerm_subnet" "azure_subnet" {
     name                            = "${local.name}-subnet"
     resource_group_name             = azurerm_resource_group.azure_rg.name
     virtual_network_name            = azurerm_virtual_network.azure_vnet.name
-    address_prefix                  = "10.0.1.0/24"
+    address_prefixes                = ["10.0.1.0/24"]
 }
 
 //  Create a Security Group

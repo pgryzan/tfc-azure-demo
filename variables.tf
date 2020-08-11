@@ -40,6 +40,6 @@ variable "image" {
 }
 
 variable "vm_count" {
-    default         = 2
+    default         = 1
     description     = "The number of VMs we want"
 }
