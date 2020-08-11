@@ -15,7 +15,7 @@ terraform {
         organization                = "pgryzan"
 
         workspaces {
-            name                    = "demo"
+            name                    = "tfc-azure-demo"
         }
     }
 }
